@@ -8,6 +8,9 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Label;
+import java.awt.Point;
+import java.awt.ScrollPane;
+import java.awt.Scrollbar;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -35,7 +38,7 @@ public class ChattingFrame {
 	BufferedImage Image=null;
 	String ImagePath = "";
 	public static ImageTextArea textArea;
-	JScrollPane scrollArea;
+	ScrollPane scrollArea;
 	JTextField textInput;
 	JMenuBar menuOption;
 	JMenu OptionMenu;
@@ -105,7 +108,8 @@ public class ChattingFrame {
 	        g.fillRect(0, 0, getWidth(), getHeight());
 	        if (BackgroundImage != null) {
 	        	int x = (this.getWidth()-BackgroundImage.getWidth(this))/2;
-	            g.drawImage(BackgroundImage, x, 0, this);    
+	        	int y = (this.getHeight()-BackgroundImage.getHeight(this));
+	            g.drawImage(BackgroundImage, x, y, this);    
 	        }
 	        super.paintComponent(g);
 		}
@@ -114,6 +118,7 @@ public class ChattingFrame {
 		String text = textArea.getText();
 		text+=("\n"+tag+" : "+content);
 		textArea.setText(text);
+		scrollArea.setScrollPosition(new Point(0,textArea.getHeight()));
 	}
 	public ChattingFrame(boolean opn, String IP, int PORT){
 		this.opn=opn;
@@ -125,12 +130,10 @@ public class ChattingFrame {
 		InfoDialog.add(new Label("아 이거 왜만들었지",Label.CENTER));
 		Button button = new Button("확인");
 		button.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				InfoDialog.setVisible(false);				
 			}
-			
 		});
 		InfoDialog.add(button);
 		if(opn){
@@ -151,7 +154,8 @@ public class ChattingFrame {
 		textArea = new ImageTextArea("채팅이 시작되었습니다.");
 		textArea.setSize(500, 450);
 		textArea.setEditable(false);
-		scrollArea = new JScrollPane(textArea);
+		scrollArea = new ScrollPane();
+		scrollArea.add(textArea);
 		scrollArea.setSize(500,450);
 		layout.add(scrollArea,"Center");
 		textInput = new JTextField();
@@ -216,7 +220,7 @@ public class ChattingFrame {
                         Image image = ImageIO.read(fc.getSelectedFile());
                         if (image != null){
                         	int height = image.getHeight(textArea);
-                        	float ratio = (float)textArea.getHeight()/(float)height;
+                        	float ratio = (float)scrollArea.getHeight()/(float)height;
                         	image = image.getScaledInstance((int)(image.getWidth(textArea)*ratio), (int)(image.getHeight(textArea)*ratio), 400);
                             textArea.setBackgroundImage(image);
                         }
