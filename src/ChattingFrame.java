@@ -1,17 +1,25 @@
 import java.awt.BorderLayout;
 import java.awt.Button;
+import java.awt.Color;
 import java.awt.Dialog;
+import java.awt.FileDialog;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -24,7 +32,9 @@ import javax.swing.JTextField;
 public class ChattingFrame {
 	JFrame window;
 	JPanel layout;
-	public static JTextArea textArea;
+	BufferedImage Image=null;
+	String ImagePath = "";
+	public static ImageTextArea textArea;
 	JScrollPane scrollArea;
 	JTextField textInput;
 	JMenuBar menuOption;
@@ -36,7 +46,7 @@ public class ChattingFrame {
 	Network socket;
 	int connection = -1;
 	String InputBuffer="";
-	final Dialog ErrorDialog = new Dialog(window,"에러",true);
+	final Dialog InfoDialog = new Dialog(window,"정보",true);
 	boolean opn;
 	class ReadThread implements Runnable{
 		@Override
@@ -68,13 +78,36 @@ public class ChattingFrame {
 		@Override
 		public void run(){
 			while(true){
-				System.out.println("쓰레드 정상작동1");
+				
 				if(!InputBuffer.equals("")){
 					socket.send(InputBuffer);
 					writeLine("나",InputBuffer);
 					InputBuffer="";
+				}else{
+					System.out.println("쓰레드 정상작동1");
 				}
 			}
+		}
+	}
+	class ImageTextArea extends JTextArea{
+		private Image BackgroundImage;
+		public ImageTextArea(String string) {
+			super(string);
+			setOpaque(false);
+		}
+		public void setBackgroundImage(Image image){
+			this.BackgroundImage=image;
+			this.repaint();
+		}
+		@Override
+		protected void paintComponent(Graphics g){
+	        g.setColor(getBackground());
+	        g.fillRect(0, 0, getWidth(), getHeight());
+	        if (BackgroundImage != null) {
+	        	int x = (this.getWidth()-BackgroundImage.getWidth(this))/2;
+	            g.drawImage(BackgroundImage, x, 0, this);    
+	        }
+	        super.paintComponent(g);
 		}
 	}
 	void writeLine(String tag,String content){
@@ -84,20 +117,22 @@ public class ChattingFrame {
 	}
 	public ChattingFrame(boolean opn, String IP, int PORT){
 		this.opn=opn;
-		ErrorDialog.setSize(200, 100);
-		ErrorDialog.setLocation(250, 250);
-		ErrorDialog.setLayout(new GridLayout(2,1));
-		ErrorDialog.add(new Label("에러가 발생했습니다.",Label.CENTER));
+		InfoDialog.setSize(300, 100);
+		InfoDialog.setLocation(250, 250);
+		InfoDialog.setLayout(new GridLayout(4,1));
+		InfoDialog.add(new Label("만든사람 : 정유빈",Label.CENTER));
+		InfoDialog.add(new Label("Java 수행평가",Label.CENTER));
+		InfoDialog.add(new Label("아 이거 왜만들었지",Label.CENTER));
 		Button button = new Button("확인");
 		button.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				ErrorDialog.setVisible(false);				
+				InfoDialog.setVisible(false);				
 			}
 			
 		});
-		ErrorDialog.add(button);
+		InfoDialog.add(button);
 		if(opn){
 			socket = new Host(PORT);
 		}else{
@@ -113,7 +148,7 @@ public class ChattingFrame {
 		layout = new JPanel();
 		layout.setLayout(new BorderLayout());
 		window.add(layout);
-		textArea = new JTextArea("채팅이 시작되었습니다.");
+		textArea = new ImageTextArea("채팅이 시작되었습니다.");
 		textArea.setSize(500, 450);
 		textArea.setEditable(false);
 		scrollArea = new JScrollPane(textArea);
@@ -161,7 +196,6 @@ public class ChattingFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getActionCommand()!="\n"){
 					InputBuffer=textInput.getText();
-					System.out.println(InputBuffer);
 					textInput.setText("");
 				}		
 			}
@@ -171,6 +205,29 @@ public class ChattingFrame {
 		menuOption = new JMenuBar();
 		OptionMenu = new JMenu("설정");
 		Background = new JMenuItem("배경화면 설정");
+		Background.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fc = new JFileChooser(System.getProperty("user.home"));
+                int returnVal = fc.showOpenDialog(window);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        Image image = ImageIO.read(fc.getSelectedFile());
+                        if (image != null){
+                        	int height = image.getHeight(textArea);
+                        	float ratio = (float)textArea.getHeight()/(float)height;
+                        	image = image.getScaledInstance((int)(image.getWidth(textArea)*ratio), (int)(image.getHeight(textArea)*ratio), 400);
+                            textArea.setBackgroundImage(image);
+                        }
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+			}
+			
+		});
+		
 		OptionMenu.add(Background);
 		Quit = new JMenuItem("종료");
 		Quit.addActionListener(new ActionListener(){
@@ -184,7 +241,14 @@ public class ChattingFrame {
 		});
 		OptionMenu.add(Quit);
 		InfoMenu = new JMenu("정보");
-		InfoMenu.add(new JMenuItem("프로그램 정보"));
+		ProgramInfo = new JMenuItem("프로그램 정보");
+		ProgramInfo.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				InfoDialog.setVisible(true);
+			}
+		});
+		InfoMenu.add(ProgramInfo);
 		menuOption.add(OptionMenu);
 		menuOption.add(InfoMenu);
 		window.setJMenuBar(menuOption);
