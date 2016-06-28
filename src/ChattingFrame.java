@@ -46,16 +46,16 @@ public class ChattingFrame {
 	JMenuItem Background;
 	JMenuItem Quit;
 	JMenuItem ProgramInfo;
-	Network socket;
+	Network socket; //네트워크를 갖는 소켓객체를 할당합니다
 	int connection = -1;
-	String InputBuffer="";
-	final Dialog InfoDialog = new Dialog(window,"정보",true);
+	String InputBuffer="";//입력버퍼입니다
+	final Dialog InfoDialog = new Dialog(window,"정보",true); //정보 다이얼로그 객체입니다
 	boolean opn;
-	class ReadThread implements Runnable{
+	class ReadThread implements Runnable{ //출력 쓰레드입니다
 		@Override
 		public void run() {
 			if(connection == -1){
-				if(opn){
+				if(opn){ //호스트와 클라이언트를 분기하여 처리합니다.
 					writeLine("SYSTEM","연결 대기중입니다.");
 					((Host)socket).listen();
 					writeLine("SYSTEM","연결되었습니다. 즐거운 언어 생활을 가집시다.");
@@ -70,19 +70,19 @@ public class ChattingFrame {
 					writeLine("SYSTEM","연결되었습니다. 즐거운 언어 생활을 가집시다.");
 				}
 			}
-			while(true){
+			while(true){  //메세지를 수신하고 출력합니다.
 				String string = "";
 				string = socket.recv();
 				if(!string.equals("")) writeLine("상대방",string);
 			}
 		}
 	}
-	class WriteThread implements Runnable{
+	class WriteThread implements Runnable{ //출력 쓰레드입니다.
 		@Override
 		public void run(){
 			while(true){
 				
-				if(!InputBuffer.equals("")){
+				if(!InputBuffer.equals("")){ //입력버퍼가 차있으면 전송합니다.
 					socket.send(InputBuffer);
 					writeLine("나",InputBuffer);
 					InputBuffer="";
@@ -92,13 +92,13 @@ public class ChattingFrame {
 			}
 		}
 	}
-	class ImageTextArea extends JTextArea{
-		private Image BackgroundImage;
+	class ImageTextArea extends JTextArea{ //배경화면을 가질 수 있는 TextArea객체를 JTextArea를 상속하여 만듭니다.
+		private Image BackgroundImage; //배경화면 이미지 객체입니다.
 		public ImageTextArea(String string) {
 			super(string);
 			setOpaque(false);
 		}
-		public void setBackgroundImage(Image image){
+		public void setBackgroundImage(Image image){ //배경화면을 지정합니다.
 			this.BackgroundImage=image;
 			this.repaint();
 		}
@@ -107,20 +107,20 @@ public class ChattingFrame {
 	        g.setColor(getBackground());
 	        g.fillRect(0, 0, getWidth(), getHeight());
 	        if (BackgroundImage != null) {
-	        	int x = (this.getWidth()-BackgroundImage.getWidth(this))/2;
+	        	int x = (this.getWidth()-BackgroundImage.getWidth(this))/2; //중앙정렬을 계산합니다.
 	        	int y = (this.getHeight()-BackgroundImage.getHeight(this));
-	            g.drawImage(BackgroundImage, x, y, this);    
+	            g.drawImage(BackgroundImage, x, y, this); //배경화면을 그립니다.
 	        }
 	        super.paintComponent(g);
 		}
 	}
-	void writeLine(String tag,String content){
+	void writeLine(String tag,String content){ //채팅을 기록하는 출력 함수입니다.
 		String text = textArea.getText();
-		text+=("\n"+tag+" : "+content);
+		text+=("\n"+tag+" : "+content); //말하는 사람과 그 내용을 더합니다.
 		textArea.setText(text);
-		scrollArea.setScrollPosition(new Point(0,textArea.getHeight()));
+		scrollArea.setScrollPosition(new Point(0,textArea.getHeight())); //스크롤을 아래로 강제합니다.
 	}
-	public ChattingFrame(boolean opn, String IP, int PORT){
+	public ChattingFrame(boolean opn, String IP, int PORT){ //채팅창 생성자입니다. 호스트여부와 IP와 PORT를 받습니다.
 		this.opn=opn;
 		InfoDialog.setSize(300, 100);
 		InfoDialog.setLocation(250, 250);
@@ -144,7 +144,7 @@ public class ChattingFrame {
 		onCreate();
 		ChatMain();
 	}
-	void onCreate(){
+	void onCreate(){ //레이아웃을 구성하는 생성함수입니다.
 		window = new JFrame();
 		window.setTitle("채팅");
 		window.setSize(500,500);
@@ -165,31 +165,26 @@ public class ChattingFrame {
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				
 			}
 
 			@Override
 			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				textInput.setText("");
 			}
 			
@@ -213,16 +208,16 @@ public class ChattingFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fc = new JFileChooser(System.getProperty("user.home"));
+				JFileChooser fc = new JFileChooser(System.getProperty("user.home")); //파일 선택창을 호출합니다.
                 int returnVal = fc.showOpenDialog(window);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     try {
-                        Image image = ImageIO.read(fc.getSelectedFile());
+                        Image image = ImageIO.read(fc.getSelectedFile()); //이미지를 불러옵니다.
                         if (image != null){
                         	int height = image.getHeight(textArea);
                         	float ratio = (float)scrollArea.getHeight()/(float)height;
-                        	image = image.getScaledInstance((int)(image.getWidth(textArea)*ratio), (int)(image.getHeight(textArea)*ratio), 400);
-                            textArea.setBackgroundImage(image);
+                        	image = image.getScaledInstance((int)(image.getWidth(textArea)*ratio), (int)(image.getHeight(textArea)*ratio), 400); //이미지를 계산하여 사이즈에 맞게 리사이징합니다.
+                            textArea.setBackgroundImage(image); //배경이미지를 지정합니다.
                         }
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -260,8 +255,10 @@ public class ChattingFrame {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
-	void ChatMain(){
-		new Thread(new ReadThread()).start();
-		new Thread(new WriteThread()).start();
+	void ChatMain(){ //쓰레드를 시작하여 실제로 채팅이 이루어지는 채팅 메인입니다.
+		Thread read = new Thread(new ReadThread());
+		Thread write= new Thread(new WriteThread());
+		read.start();
+		write.start();
 	}
 }

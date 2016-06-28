@@ -6,12 +6,12 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public abstract class DataSocket {
-	protected InputStream inStream;
-	protected OutputStream outStream;
-	protected DataInputStream subIn;
-	protected DataOutputStream subOut;
-	protected Socket socket;
-	int PORT;
-	abstract int init();
+public abstract class DataSocket { //Socket 통신 추상클래스입니다.
+	protected InputStream inStream; //입력 스트림을 갖습니다
+	protected OutputStream outStream; //출력 스트림을 갖습니다
+	protected DataInputStream subIn; //데이터 입력 스트림을 갖습니다
+	protected DataOutputStream subOut; //데이터 출력 스트림을 갖습니다
+	protected Socket socket; //소켓객체를 갖습니다
+	int PORT; //포트를 갖습니다
+	abstract int init(); //소켓 바인딩과정을 갖습니다.
 }

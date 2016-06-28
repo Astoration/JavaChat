@@ -14,31 +14,31 @@ import java.awt.event.MouseListener;
 import javax.swing.*;
 
 public class Main {
-	public static Main main;
-	JFrame window;
-	JPanel layout;
-	JPanel InfoLayout;
-	CheckboxGroup group;
-	Checkbox host;
-	Checkbox client;
-	Label IPLabel;
-	Label PORTLabel;
-	JTextField IPField;
-	JTextField PORTField;
-	JPanel buttonLayout;
-	JButton startButton;
-	ChattingFrame chattingRoom;
-	JPanel IPPanel;
-	JPanel PORTPanel;
-	public void setView(boolean b){
+	public static Main main; //프로그램 전체를 관리할 Main 객체 입니다
+	JFrame window; //프로그램 전체의 UI 창입니다
+	JPanel layout; //전체 UI를 관리할 Panel입니다
+	JPanel InfoLayout; //호스트와 클라이언트를 고를 판넬입니다.
+	CheckboxGroup group; //체크박스 그룹입니다
+	Checkbox host; //호스트 체크박스입니다
+	Checkbox client; //클라이언트 체크박스입니다
+	Label IPLabel; 
+	Label PORTLabel; //IP와 포트 설명글입니다
+	JTextField IPField; 
+	JTextField PORTField; //IP와 포트를 입력하는 텍스트 필드입니다
+	JPanel buttonLayout; //시작버튼 레이아웃을 관리할 판넬입니다
+	JButton startButton; // 시작버튼입니다
+	ChattingFrame chattingRoom; //채팅창 객체입니다
+	JPanel IPPanel; 
+	JPanel PORTPanel; //IP와 PORT를 관리할 판넬입니다
+	public void setView(boolean b){ //메인창을 전역객체에서 메인창을 관리할 함수 입니다
 		window.setVisible(b);
 	}
-	public Main(){
+	public Main(){ //메인의 생성자입니다.
 		onCreate();
 	}
-	void onCreate(){
-		window = new JFrame("채팅");
-		window.setSize(250,400);
+	void onCreate(){ //생성시 레이아웃을 구성하는 함수입니다.
+		window = new JFrame("채팅"); //“채팅”이란 TItle의 윈도우 창을 생성합니다.
+		window.setSize(250,400); //윈도우창의 사이즈를 지정합니다
 		layout = new JPanel();
 		InfoLayout = new JPanel();
 		layout.setLayout(new GridLayout(4,1));
@@ -46,14 +46,14 @@ public class Main {
 		host = new Checkbox("호스트",true,group);
 		host.addItemListener(new ItemListener(){
 			@Override
-			public void itemStateChanged(ItemEvent arg0) {
+			public void itemStateChanged(ItemEvent arg0) { //호스트가 선택되면 IP필드를 비활성화 하는 리스너입니다
 				boolean checked = host.getState();
 				if(checked) IPField.setEditable(false);
 				else IPField.setEditable(true);
 			}
 		});
 		client = new Checkbox("클라이언트",false,group);
-		client.addItemListener(new ItemListener(){
+		client.addItemListener(new ItemListener(){  //호스트가 선택되면 IP 필드를 비활성화하는 리스너입니다.
 			@Override
 			public void itemStateChanged(ItemEvent arg0){
 				boolean checked = client.getState();
@@ -98,7 +98,7 @@ public class Main {
 		window.setVisible(true);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	public static void main(String[] args){
+	public static void main(String[] args){ //프로그램의 진입점입니다.
 		main =new Main();
 	}
 }
